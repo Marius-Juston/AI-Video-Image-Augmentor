@@ -36,3 +36,7 @@ var/
 .idea/**/dictionaries
 .idea/**/shelf
 TecoGAN/
+
+dain_model/checkpoints
+dain_model/model_weights/*/
+DAIN/
