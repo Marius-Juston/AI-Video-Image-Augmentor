@@ -1,7 +1,7 @@
 import tensorflow as tf
 
 # Definition of the generator, more details can be found in TecoGAN paper
-from model_runner.ops import conv2, bicubic_four, conv2_tran, preprocess, lrelu, maxpool
+from teco_gan.ops import conv2, bicubic_four, conv2_tran, preprocess, lrelu, maxpool
 
 # SOME CODE DUPLICATED FROM https://github.com/thunil/TecoGAN
 

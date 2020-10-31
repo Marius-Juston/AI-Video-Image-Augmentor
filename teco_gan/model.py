@@ -9,9 +9,9 @@ import numpy as np
 import tensorflow as tf
 
 # SOME CODE DUPLICATED FROM https://github.com/thunil/TecoGAN
-from model_runner.dataloader import inference_data_loader
-from model_runner.frvsr import generator_F, fnet
-from model_runner.ops import deprocess, upscale_four, save_img
+from teco_gan.dataloader import inference_data_loader
+from teco_gan.frvsr import generator_F, fnet
+from teco_gan.ops import deprocess, upscale_four, save_img
 
 
 class TecoGAN:
