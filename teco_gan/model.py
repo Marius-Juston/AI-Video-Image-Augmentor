@@ -105,6 +105,7 @@ class TecoGAN:
             os.makedirs(output_folder)
 
         with tf.Session(config=config) as sess:
+
             # Load the pretrained model
             sess.run(init_op)
             sess.run(local_init_op)
@@ -114,6 +115,9 @@ class TecoGAN:
 
             weight_initiallizer.restore(sess, self.model_checkpoint)
             max_iter = len(inference_data.inputs)
+
+            writer = tf.summary.FileWriter('./graphs', graph=sess.graph)
+            writer.add_graph(sess.graph)
 
             srtime = 0
             print('Frame evaluation starts!!')
@@ -134,10 +138,13 @@ class TecoGAN:
                     save_img(out_path, output_frame[0])
                 else:  # First 5 is a hard-coded symmetric frame padding, ignored but time added!
                     print("Warming up %d" % (5 - i))
+
+        writer.flush()
+        writer.close()
         print("total time " + str(srtime) + ", frame number " + str(max_iter))
 
 
 if __name__ == '__main__':
     teco_gan = TecoGAN((360, 480, 3), './model/TecoGAN/TecoGAN')
 
-    # teco_gan.run('../input', '../output', 10)
+    teco_gan.run('../input', '../output', 10)
