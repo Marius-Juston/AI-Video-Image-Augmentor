@@ -8,6 +8,8 @@ from zipfile import ZipFile
 import numpy as np
 import tensorflow as tf
 
+tf.reset_default_graph()
+
 # SOME CODE DUPLICATED FROM https://github.com/thunil/TecoGAN
 from teco_gan.dataloader import inference_data_loader
 from teco_gan.frvsr import generator_F, fnet
@@ -57,26 +59,26 @@ class TecoGAN:
         # build the graph
         self.inputs_raw = tf.placeholder(tf.float32, shape=input_shape, name='inputs_raw')
 
-        pre_inputs = tf.Variable(tf.zeros(input_shape), trainable=False, name='pre_inputs')
-        pre_gen = tf.Variable(tf.zeros(output_shape), trainable=False, name='pre_gen')
-        pre_warp = tf.Variable(tf.zeros(output_shape), trainable=False, name='pre_warp')
+        self.pre_inputs = tf.Variable(tf.zeros(input_shape), trainable=False, name='pre_inputs')
+        self.pre_gen = tf.Variable(tf.zeros(output_shape), trainable=False, name='pre_gen')
+        self.pre_warp = tf.Variable(tf.zeros(output_shape), trainable=False, name='pre_warp')
 
-        transpose_pre = tf.space_to_depth(pre_warp, 4)
+        transpose_pre = tf.space_to_depth(self.pre_warp, 4)
         inputs_all = tf.concat((self.inputs_raw, transpose_pre), axis=-1)
         with tf.variable_scope('generator'):
             gen_output = generator_F(inputs_all, 3, reuse=False, num_resblock=self.num_resblock)
             # Deprocess the images outputed from the model, and assign things for next frame
-            with tf.control_dependencies([tf.assign(pre_inputs, self.inputs_raw)]):
-                self.outputs = tf.assign(pre_gen, deprocess(gen_output))
+            with tf.control_dependencies([tf.assign(self.pre_inputs, self.inputs_raw)]):
+                self.outputs = tf.assign(self.pre_gen, deprocess(gen_output))
 
-        inputs_frames = tf.concat((pre_inputs, self.inputs_raw), axis=-1)
+        inputs_frames = tf.concat((self.pre_inputs, self.inputs_raw), axis=-1)
         with tf.variable_scope('fnet'):
             gen_flow_lr = fnet(inputs_frames, reuse=False)
             gen_flow_lr = tf.pad(gen_flow_lr, paddings, "SYMMETRIC")
             gen_flow = upscale_four(gen_flow_lr * 4.0)
             gen_flow.set_shape(output_shape[:-1] + [2])
-        pre_warp_hi = tf.contrib.image.dense_image_warp(pre_gen, gen_flow)
-        self.before_ops = tf.assign(pre_warp, pre_warp_hi)
+        self.pre_warp_hi = tf.contrib.image.dense_image_warp(self.pre_gen, gen_flow)
+        self.before_ops = tf.assign(self.pre_warp, self.pre_warp_hi)
 
         print('Finish building the network')
 
