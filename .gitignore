@@ -1,6 +1,8 @@
 input/
 output/
+input*/
 model_runner/model
+teco_gan/graphs
 
 ### Python template
 # Byte-compiled / optimized / DLL files
